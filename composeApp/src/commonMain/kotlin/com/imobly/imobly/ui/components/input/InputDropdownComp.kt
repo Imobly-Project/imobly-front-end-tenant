@@ -25,6 +25,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.imobly.imobly.ui.components.messageerror.MessageErrorComp
 import com.imobly.imobly.ui.theme.colors.BackGroundColor
 import com.imobly.imobly.ui.theme.colors.PrimaryColor
 import com.imobly.imobly.ui.theme.fonts.montserratFont
@@ -34,9 +35,11 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Composable
 fun InputDropdownComp(
     label: String,
-    options: List<String>,
+    options: Map<String, String>,
     selectedOption: String,
     onOptionSelected: (String) -> Unit,
+    isError: Boolean = false,
+    errorMessage: String = "",
     isEnabled: Boolean = true,
     modifier: Modifier = Modifier.padding(16.dp).fillMaxWidth()
 ) {
@@ -84,6 +87,10 @@ fun InputDropdownComp(
             }
         )
 
+        if (isError) {
+            MessageErrorComp(errorMessage)
+        }
+
         ExposedDropdownMenu(
             expanded = expanded && isEnabled,
             onDismissRequest = { expanded = false }
@@ -92,14 +99,14 @@ fun InputDropdownComp(
                 DropdownMenuItem(
                     text = {
                         Text(
-                            option,
+                            option.key,
                             fontFamily = montserratFont(),
                             fontSize = 15.sp,
                             fontWeight = FontWeight.Bold
                         )
                     },
                     onClick = {
-                        onOptionSelected(option)
+                        onOptionSelected(option.value)
                         expanded = false
                     }
                 )
@@ -118,7 +125,12 @@ fun InputDropdownCompPreview() {
         var selected by remember { mutableStateOf("SINGLE") }
         InputDropdownComp(
             label = "Estado Civil",
-            options = listOf("MARRIED", "SINGLE", "WIDOWED", "DIVORCED"),
+            options = mapOf(
+                Pair("MARRIED", "1"),
+                Pair("SINGLE", "2"),
+                Pair("WIDOWED", "3"),
+                Pair("DIVORCED", "3")
+            ),
             selectedOption = selected,
             onOptionSelected = { selected = it }
         )

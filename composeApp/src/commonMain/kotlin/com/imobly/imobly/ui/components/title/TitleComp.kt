@@ -34,7 +34,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 
 
 @Composable
-fun TitleComp(text: String, buttonBackAction: () -> Unit, backButton: Boolean = true, fontSize: TextUnit = 20.sp) {
+fun TitleComp(text: String, buttonBackAction: () -> Unit = {}, backButton: Boolean = false, fontSize: TextUnit = 20.sp) {
 
     Box(
         Modifier

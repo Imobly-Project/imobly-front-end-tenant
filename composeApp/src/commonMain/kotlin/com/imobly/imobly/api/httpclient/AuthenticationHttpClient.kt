@@ -13,7 +13,6 @@ import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.forms.MultiPartFormDataContent
 import io.ktor.client.request.forms.formData
-import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
@@ -45,7 +44,6 @@ class AuthenticationHttpClient(val httpClient: HttpClient) {
 
     suspend fun signUp(tenant: Tenant, image: GalleryPhotoResult?): ResponseMessage {
         val response = httpClient.post("$baseUrl/cadastrar") {
-            header("Authorization", "Bearer ${TOKEN}")
             setBody(
                 MultiPartFormDataContent(
                     formData {

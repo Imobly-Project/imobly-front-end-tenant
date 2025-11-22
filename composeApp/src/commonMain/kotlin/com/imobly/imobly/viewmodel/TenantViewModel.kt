@@ -9,21 +9,18 @@ import androidx.navigation.NavHostController
 import com.imobly.imobly.api.createHttpClient
 import com.imobly.imobly.api.dto.ErrorDTO
 import com.imobly.imobly.api.dto.Ok
+import com.imobly.imobly.api.dto.UpdateProfileDTO
 import com.imobly.imobly.api.httpclient.AuthenticationHttpClient
 import com.imobly.imobly.api.httpclient.TenantHttpClient
 import com.imobly.imobly.domain.Telephone
 import com.imobly.imobly.domain.Tenant
+import com.imobly.imobly.domain.enums.MaritalStatusEnum
 import io.github.ismoy.imagepickerkmp.domain.models.GalleryPhotoResult
 import kotlinx.coroutines.launch
 
-
 class TenantViewModel(private val navController: NavHostController): ViewModel() {
 
-    val tenants: MutableState<List<Tenant>> = mutableStateOf(emptyList())
-
     val tenant = mutableStateOf(Tenant())
-
-    val searchText: MutableState<String> = mutableStateOf("")
 
     val selectedImages = mutableStateOf(emptyList<GalleryPhotoResult>())
 
@@ -58,15 +55,12 @@ class TenantViewModel(private val navController: NavHostController): ViewModel()
         selectedImages.value = emptyList()
         inputErrors.value = emptyMap()
         messageError.value = ""
-        searchText.value = ""
     }
 
     fun hiddenEditButton() {
         inputLockState.value = !inputLockState.value
     }
-    fun changeSearchText(it: String) {
-        searchText.value = it
-    }
+
 
     fun inputContainsError(inputLabel: String): Boolean {
         return inputErrors.value.keys.contains(inputLabel)
@@ -76,37 +70,17 @@ class TenantViewModel(private val navController: NavHostController): ViewModel()
         return inputErrors.value[inputLabel] ?: ""
     }
 
-    fun findAllAction() {
+    fun findProfileAction() {
         viewModelScope.launch {
             val httpClient = TenantHttpClient(createHttpClient())
-            tenants.value = httpClient.searchAll()
+            tenant.value = httpClient.findByProfile()
         }
-    }
-
-    fun goToEditTenant(newTenant: Tenant) {
-        tenant.value = newTenant
-        inputLockState.value = true
-        inputErrors.value = emptyMap()
-        messageError.value = ""
-        selectedImages.value = emptyList()
-        navController.navigate("edittenant")
     }
 
     fun goToHome() {
         navController.navigate("home")
     }
 
-    fun goToShowTenants() {
-        navController.navigate("showtenants")
-    }
-
-    fun goToCreateTenant() {
-        navController.navigate("createtenant")
-    }
-
-    fun goToLogin() {
-        navController.navigate("login")
-    }
 
     fun signUpAction() {
         if (selectedImages.value.isNotEmpty()) {
@@ -142,29 +116,36 @@ class TenantViewModel(private val navController: NavHostController): ViewModel()
         }
     }
 
+    fun goToLogin() {
+        navController.navigate("login")
+    }
+
     fun editAction() {
+        val dto = UpdateProfileDTO(
+            tenant.value.email,
+            tenant.value.telephones
+        )
+
         viewModelScope.launch {
             onLoadingState.value = true
             val httpClient = TenantHttpClient(createHttpClient())
-            if (tenant.value.id != null) {
-                var imageToSend: GalleryPhotoResult? = null
-                if (selectedImages.value.isNotEmpty()) {
-                    imageToSend = selectedImages.value.first()
+            var imageToSend: GalleryPhotoResult? = null
+            if (selectedImages.value.isNotEmpty()) {
+                imageToSend = selectedImages.value.first()
+            }
+            val response = httpClient.updateProfile(dto, imageToSend)
+            onLoadingState.value = false
+            when (response) {
+                is Ok -> {
+                    hiddenEditButton()
+                    snackMessage.value.showSnackbar("Sua conta foi editada com sucesso!")
                 }
-                val response = httpClient.update(tenant.value.id!!, tenant.value, imageToSend)
-                onLoadingState.value = false
-                when (response) {
-                    is Ok -> {
-                        hiddenEditButton()
-                        snackMessage.value.showSnackbar("Locatário editado com sucesso!")
-                    }
 
-                    is ErrorDTO -> {
-                        val errors = mutableMapOf<String, String>()
-                        response.errorFields?.forEach { errors[it.name] = it.description }
-                        inputErrors.value = errors
-                        messageError.value = response.message
-                    }
+                is ErrorDTO -> {
+                    val errors = mutableMapOf<String, String>()
+                    response.errorFields?.forEach { errors[it.name] = it.description }
+                    inputErrors.value = errors
+                    messageError.value = response.message
                 }
             }
         }
@@ -173,22 +154,28 @@ class TenantViewModel(private val navController: NavHostController): ViewModel()
     fun deleteAction() {
         viewModelScope.launch {
             val httpClient = TenantHttpClient(createHttpClient())
-            if (tenant.value.id != null) {
-                val response = httpClient.delete(tenant.value.id!!)
+            val response = httpClient.deleteProfile()
 
-                showDialogState.value = false
-                goToShowTenants()
-                when (response) {
-                    is Ok -> {
-                        snackMessage.value.showSnackbar("Locatário deletado com sucesso!")
-                    }
+            showDialogState.value = false
+            when (response) {
+                is Ok -> {
+                    goToLogin()
+                    snackMessage.value.showSnackbar("Locatário deletado com sucesso!")
+                }
 
-                    is ErrorDTO -> {
-                        snackMessage.value.showSnackbar("Houve um problema ao deletar a locatário!")
-                    }
+                is ErrorDTO -> {
+                    messageError.value = response.message
                 }
             }
         }
+    }
+
+    fun maritalStatusOptions(): Map<String, String> {
+        val map = mutableMapOf<String, String>()
+        MaritalStatusEnum.entries.forEach {
+            map[it.label] = it.name
+        }
+        return map
     }
 
     fun changeFirstName(it: String) {

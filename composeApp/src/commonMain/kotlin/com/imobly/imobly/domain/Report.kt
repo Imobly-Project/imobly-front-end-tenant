@@ -9,8 +9,9 @@ data class Report(
     val id: String? = null,
     val title: String = "",
     val message: String = "",
-    val moment: LocalDateTime? = null,
+    val moment: String? = "",
     val status: StatusReportEnum = StatusReportEnum.NEW,
     val response: String = "",
-    val tenant: Tenant
+    val tenant: Tenant = Tenant(),
+    val property: Property = Property()
 )
