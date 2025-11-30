@@ -22,6 +22,11 @@ class PropertyViewModel(private val navController: NavHostController): ViewModel
 
     val snackMessage : MutableState<SnackbarHostState> = mutableStateOf( SnackbarHostState() )
 
+    fun goToCreateAppointment(property: Property) {
+        SharedRepository.property = property
+        navController.navigate("createappointment")
+    }
+
     fun changeSearchText(it: String) {
         searchText.value = it
     }
@@ -48,11 +53,4 @@ class PropertyViewModel(private val navController: NavHostController): ViewModel
         }
     }
 
-    fun categoriesOptions(): Map<String, String> {
-        val map = mutableMapOf<String, String>()
-        categories.value.forEach {
-            map[it.title] = it.id ?: ""
-        }
-        return map
-    }
 }

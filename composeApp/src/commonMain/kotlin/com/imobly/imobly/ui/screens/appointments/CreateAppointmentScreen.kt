@@ -5,7 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Create
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -15,24 +15,25 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.rememberNavController
 import com.imobly.imobly.ui.components.button.ButtonComp
 import com.imobly.imobly.ui.components.input.InputComp
-import com.imobly.imobly.ui.components.input.InputDropdownComp
+import com.imobly.imobly.ui.components.input.InputDateComp
 import com.imobly.imobly.ui.components.messageerror.MessageErrorComp
 import com.imobly.imobly.ui.components.title.TitleComp
 import com.imobly.imobly.ui.components.topbar.TopBarComp
 import com.imobly.imobly.ui.theme.colors.BackGroundColor
-import com.imobly.imobly.ui.theme.colors.ConfirmColor
+import com.imobly.imobly.ui.theme.colors.PrimaryColor
 import com.imobly.imobly.viewmodel.AppointmentViewModel
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
-fun CreateAppointmentScreen(viewModel: AppointmentViewModel) {
+fun CreateAppointmentScreen(appointmentViewModel: AppointmentViewModel) {
 
     val scrollState = rememberScrollState()
-    viewModel.whenStartingThePage()
+    appointmentViewModel.whenStartingThePage()
+    appointmentViewModel.resetPage()
 
     Scaffold(
         topBar = { TopBarComp() },
-        snackbarHost = { SnackbarHost(viewModel.snackbarState) }
+        snackbarHost = { SnackbarHost(appointmentViewModel.snackMessage.value) }
     ) { paddingValues ->
 
         Column(
@@ -43,7 +44,7 @@ fun CreateAppointmentScreen(viewModel: AppointmentViewModel) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-            TitleComp("Agendar Visita", { viewModel.goBack() }, true)
+            TitleComp("Agendar Visita", { appointmentViewModel.goToShowProperties() }, true)
 
             Column(
                 Modifier
@@ -53,61 +54,49 @@ fun CreateAppointmentScreen(viewModel: AppointmentViewModel) {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
-                // Data
-                InputDropdownComp(
-                    label = "Data",
-                    options = viewModel.dateOptions().associateWith { it }, // Map<String,String>
-                    selectedOption = viewModel.scheduledDate.value,
-                    onOptionSelected = { viewModel.changeDate(it) }
-                )
-
-                // Horário
-                InputDropdownComp(
-                    label = "Hora",
-                    options = viewModel.timeOptions().associateWith { it },
-                    selectedOption = viewModel.scheduledTime.value,
-                    onOptionSelected = { viewModel.changeTime(it) }
-                )
-
-                InputComp(
-                    label = "Guia responsável",
-                    placeholder = "Ex: José Silva",
-                    value = viewModel.guide.value,
-                    onValueChange = { viewModel.changeGuide(it) },
-                )
-
                 InputComp(
                     label = "Visitante",
                     placeholder = "Ex: Maria Souza",
-                    value = viewModel.guest.value,
-                    onValueChange = { viewModel.changeGuest(it) },
+                    value = appointmentViewModel.appointment.value.guestName,
+                    onValueChange = { appointmentViewModel.changeGuestName(it) },
+                    isError = appointmentViewModel.inputContainsError("guestName"),
+                    errorMessage = appointmentViewModel.getInputErrorMessage("guestName")
                 )
 
-                InputDropdownComp(
-                    label = "Propriedade",
-                    options = viewModel.propertiesOptions().associateWith { it },
-                    selectedOption = viewModel.selectedProperty.value,
-                    onOptionSelected = { viewModel.changeProperty(it) }
+                InputDateComp(
+                    label = "Data e hora do encontro",
+                    value = appointmentViewModel.appointment.value.moment,
+                    onValueChange = { appointmentViewModel.changeMoment(it) },
+                    isError = appointmentViewModel.inputContainsError("moment"),
+                    errorMessage = appointmentViewModel.getInputErrorMessage("moment"),
+                )
+
+                InputComp(
+                    label = "Telefone",
+                    placeholder = "Ex: (00) 90000-0000",
+                    value = appointmentViewModel.appointment.value.telephone,
+                    onValueChange = { appointmentViewModel.changeTelephone(it) },
+                    isError = appointmentViewModel.inputContainsError("telephone"),
+                    errorMessage = appointmentViewModel.getInputErrorMessage("telephone")
                 )
 
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    if (viewModel.messageError.value.isNotBlank()) {
-                        MessageErrorComp(viewModel.messageError.value, 14.sp)
-                    }
-
-                    if (viewModel.loading.value) {
+                    if (appointmentViewModel.onLoadingState.value) {
                         Box(Modifier.padding(20.dp)) {
                             CircularProgressIndicator()
                         }
                     } else {
-                        ButtonComp(
-                            "Agendar visita",
-                            { Icon(Icons.Default.Check, "confirmar") },
-                            ConfirmColor,
-                            { viewModel.createAppointmentAction() },
-                            155.dp,
-                            16.sp
-                        )
+                        if (appointmentViewModel.messageError.value != "") {
+                            MessageErrorComp(appointmentViewModel.messageError.value, 14.sp)
+                        }
+                        Box(Modifier.align(Alignment.CenterHorizontally)) {
+                            ButtonComp(
+                                "Agendar",
+                                { Icon(Icons.Default.Create, "check") },
+                                PrimaryColor,
+                                { appointmentViewModel.createAction() }
+                            )
+                        }
                     }
                 }
 

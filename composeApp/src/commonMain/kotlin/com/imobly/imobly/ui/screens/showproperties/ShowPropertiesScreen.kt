@@ -20,8 +20,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Bathtub
 import androidx.compose.material.icons.filled.Bed
+import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.Garage
 import androidx.compose.material.icons.filled.Money
 import androidx.compose.material.icons.filled.SquareFoot
@@ -186,7 +188,7 @@ fun PropertyCardComp(property: Property, propertyViewModel: PropertyViewModel) {
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = "${property.address.state}/${property.address.city}, ${property.address.street}, ${property.address.number}",
+                    text = "${property.address.neighborhood}, ${property.address.street} Nº ${property.address.number}, ${property.address.city}/${property.address.state}",
                     fontWeight = FontWeight.Normal,
                     fontSize = 14.sp,
                     color = Color(0xFF666666),
@@ -222,13 +224,22 @@ fun PropertyCardComp(property: Property, propertyViewModel: PropertyViewModel) {
                         )
                     }
                 }
+
+                Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                    ButtonComp(
+                        "Agendar visita",
+                        { Icon(Icons.Default.CalendarToday, "Agendamento") },
+                        PrimaryColor,
+                        { propertyViewModel.goToCreateAppointment(property) }
+                    )
+                }
             }
         }
     }
 }
 
 @Composable
-fun TextInfoComp(text: String, icon: @Composable  () -> Unit) {
+fun TextInfoComp(text: String, icon: @Composable () -> Unit) {
     Box(
         modifier = Modifier
             .size(20.dp)
