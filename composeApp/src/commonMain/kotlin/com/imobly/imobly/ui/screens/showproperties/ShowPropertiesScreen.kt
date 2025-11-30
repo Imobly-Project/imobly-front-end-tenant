@@ -20,8 +20,11 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Bathtub
+import androidx.compose.material.icons.filled.Bed
+import androidx.compose.material.icons.filled.Garage
+import androidx.compose.material.icons.filled.Money
+import androidx.compose.material.icons.filled.SquareFoot
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -107,7 +110,6 @@ fun ShowPropertiesScreen(propertyViewModel: PropertyViewModel) {
                             PropertyCardComp(property, propertyViewModel)
                         }
                     }
-
                 }
             }
         }
@@ -196,111 +198,63 @@ fun PropertyCardComp(property: Property, propertyViewModel: PropertyViewModel) {
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Box(
-                                modifier = Modifier
-                                    .size(20.dp)
-                                    .background(
-                                        color = Color(0xFFF2603F).copy(alpha = 0.2f),
-                                        shape = CircleShape
-                                    ),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Icon(Icons.Default.Check, "check")
-                            }
-
-                            Spacer(modifier = Modifier.width(12.dp))
-
-                            Text(
-                                text = "Área: ${property.area} m²",
-                                fontWeight = FontWeight.Medium,
-                                fontSize = 14.sp,
-                                color = Color(0xFF333333),
-                                fontFamily = montserratFont()
-                            )
-
-                            Spacer(modifier = Modifier.width(12.dp))
-
-                            Box(
-                                modifier = Modifier
-                                    .size(20.dp)
-                                    .background(
-                                        color = Color(0xFFF2603F).copy(alpha = 0.2f),
-                                        shape = CircleShape
-                                    ),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Icon(Icons.Default.Check, "check")
-                            }
-
-                            Spacer(modifier = Modifier.width(12.dp))
-
-                            Text(
-                                text = "Nª quartos: ${property.bedrooms}",
-                                fontWeight = FontWeight.Medium,
-                                fontSize = 14.sp,
-                                color = Color(0xFF333333),
-                                fontFamily = montserratFont()
-                            )
-                        }
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        TextInfoComp(
+                            "Área: ${property.area} m²",
+                            { Icon(Icons.Default.SquareFoot, "Área") }
+                        )
+                        Spacer(modifier = Modifier.width(12.dp))
+                        TextInfoComp(
+                            "Nª quartos: ${property.bedrooms}",
+                            { Icon(Icons.Default.Bed, "Quartos") }
+                        )
+                    }
 
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Box(
-                            modifier = Modifier
-                                .size(20.dp)
-                                .background(
-                                    color = Color(0xFFF2603F).copy(alpha = 0.2f),
-                                    shape = CircleShape
-                                ),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(Icons.Default.Check, "check")
-                        }
-
-                        Spacer(modifier = Modifier.width(12.dp))
-
-                        Text(
-                            text = "Vagas garagem: ${property.garageSpaces}",
-                            fontWeight = FontWeight.Medium,
-                            fontSize = 14.sp,
-                            color = Color(0xFF333333),
-                            fontFamily = montserratFont()
+                        TextInfoComp(
+                            "Vagas garagem: ${property.garageSpaces}",
+                            { Icon(Icons.Default.Garage, "Garagem") }
                         )
-
                         Spacer(modifier = Modifier.width(12.dp))
-
-                        Box(
-                            modifier = Modifier
-                                .size(20.dp)
-                                .background(
-                                    color = Color(0xFFF2603F).copy(alpha = 0.2f),
-                                    shape = CircleShape
-                                ),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(Icons.Default.Check, "check")
-                        }
-
-                        Spacer(modifier = Modifier.width(12.dp))
-
-                        Text(
-                            text = "Nª banheiros: ${property.bathrooms}",
-                            fontWeight = FontWeight.Medium,
-                            fontSize = 14.sp,
-                            color = Color(0xFF333333),
-                            fontFamily = montserratFont()
+                        TextInfoComp(
+                            "Nª banheiros: ${property.bathrooms}",
+                            { Icon(Icons.Default.Bathtub, "Banheiros") }
                         )
                     }
                 }
-
             }
         }
     }
 }
 
+@Composable
+fun TextInfoComp(text: String, icon: @Composable  () -> Unit) {
+    Box(
+        modifier = Modifier
+            .size(20.dp)
+            .background(
+                color = Color(0xFFF2603F).copy(alpha = 0.2f),
+                shape = CircleShape
+            ),
+        contentAlignment = Alignment.Center
+    ) {
+        icon()
+    }
+
+    Spacer(modifier = Modifier.width(12.dp))
+
+    Text(
+        text = text,
+        fontWeight = FontWeight.Medium,
+        fontSize = 14.sp,
+        color = Color(0xFF333333),
+        fontFamily = montserratFont()
+    )
+}
+
 @Preview
 @Composable
-fun ShowPropertiesScreenPreview() {
+fun ShowPropertiesPreview() {
     val navControllerFake = rememberNavController()
     ShowPropertiesScreen(PropertyViewModel(navControllerFake))
 }

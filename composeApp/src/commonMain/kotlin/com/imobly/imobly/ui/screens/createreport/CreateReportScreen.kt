@@ -5,7 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
@@ -23,7 +23,7 @@ import com.imobly.imobly.ui.components.messageerror.MessageErrorComp
 import com.imobly.imobly.ui.components.title.TitleComp
 import com.imobly.imobly.ui.components.topbar.TopBarComp
 import com.imobly.imobly.ui.theme.colors.BackGroundColor
-import com.imobly.imobly.ui.theme.colors.ConfirmColor
+import com.imobly.imobly.ui.theme.colors.PrimaryColor
 import com.imobly.imobly.viewmodel.ReportViewModel
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -99,11 +99,9 @@ fun CreateReportScreen(reportViewModel: ReportViewModel) {
                     } else {
                         ButtonComp(
                             "Enviar reportação",
-                            { Icon(Icons.Default.Check, "enviar resposta") },
-                            ConfirmColor,
-                            { reportViewModel.createReportAction() },
-                            155.dp,
-                            16.sp
+                            { Icon(Icons.Default.Add, "Enviar resposta") },
+                            PrimaryColor,
+                            { reportViewModel.createReportAction() }
                         )
                     }
                 }

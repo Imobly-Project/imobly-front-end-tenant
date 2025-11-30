@@ -195,7 +195,6 @@ fun HomeScreen(homeViewModel: HomeViewModel) {
                                     action = { homeViewModel.logOut() },
                                     backgroundColor = backgroundColor,
                                     highlightColor = highlightColor
-
                                 )
                             }
                         }

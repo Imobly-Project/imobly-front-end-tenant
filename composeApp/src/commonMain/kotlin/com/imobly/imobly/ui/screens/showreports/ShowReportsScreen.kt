@@ -1,13 +1,17 @@
 package com.imobly.imobly.ui.screens.showreports
 
-
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.LockClock
+import androidx.compose.material.icons.filled.PunchClock
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -97,7 +101,7 @@ fun ShowReportsScreen(reportViewModel: ReportViewModel) {
                         contentPadding = PaddingValues(bottom = 16.dp)
                     ) {
                         items(reports.value) { report ->
-                            ReportCardComp(report, {})
+                            ReportCardComp(report)
                         }
                     }
                 }
@@ -107,7 +111,7 @@ fun ShowReportsScreen(reportViewModel: ReportViewModel) {
 }
 
 @Composable
-fun ReportCardComp(report: Report, action: () -> Unit) {
+fun ReportCardComp(report: Report) {
     val statusColor:Color = when (report.status){
         StatusReportEnum.NEW -> Color(0xFF0059ff)
         StatusReportEnum.PENDING-> Color(0xFFFFC107)
@@ -116,7 +120,6 @@ fun ReportCardComp(report: Report, action: () -> Unit) {
     }
 
     Card(
-        onClick = action,
         modifier = Modifier
             .padding(10.dp)
             .widthIn(max = 700.dp)
@@ -130,6 +133,7 @@ fun ReportCardComp(report: Report, action: () -> Unit) {
         Column(
             Modifier.padding(16.dp)
         ) {
+
             Text(
                 report.title,
                 fontFamily = montserratFont(),
@@ -137,11 +141,12 @@ fun ReportCardComp(report: Report, action: () -> Unit) {
                 fontWeight = FontWeight.Bold,
                 color = Color(0xFF222222)
             )
+
             Text(
                 report.message,
                 modifier = Modifier.padding(top = 4.dp, bottom = 8.dp),
                 fontFamily = montserratFont(),
-                fontSize = 13.sp,
+                fontSize = 14.sp,
                 color = Color(0xFF555555)
             )
 
@@ -150,12 +155,15 @@ fun ReportCardComp(report: Report, action: () -> Unit) {
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    "🕒 ${report.moment}",
-                    fontSize = 12.sp,
-                    color = Color.Gray,
-                    fontFamily = montserratFont()
-                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Default.AccessTime, contentDescription = "Relógio", Modifier.padding(5.dp))
+                    Text(
+                        "${report.moment}",
+                        fontSize = 14.sp,
+                        color = Color.Gray,
+                        fontFamily = montserratFont()
+                    )
+                }
                 Box(
                     modifier = Modifier
                         .background(
@@ -166,7 +174,7 @@ fun ReportCardComp(report: Report, action: () -> Unit) {
                 ) {
                     Text(
                         report.status.label,
-                        fontSize = 12.sp,
+                        fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.White,
                         fontFamily = montserratFont()
@@ -175,38 +183,69 @@ fun ReportCardComp(report: Report, action: () -> Unit) {
             }
 
             if (report.response.isNotBlank()) {
+                Box(Modifier.padding(5.dp)) {
+                    Column(
+                        Modifier
+                            .border(1.dp, Color.Black, RoundedCornerShape(10.dp))
+                            .padding(10.dp)
+                            .fillMaxWidth()
+                    ) {
+                        Text(
+                            "Resposta:",
+                            fontWeight = FontWeight.SemiBold,
+                            fontSize = 14.sp,
+                            fontFamily = montserratFont()
+                        )
+
+                        Text(
+                            report.response,
+                            fontSize = 14.sp,
+                            color = Color(0xFF444444),
+                            fontFamily = montserratFont()
+                        )
+                    }
+                }
+            }
+
+            Row {
                 Text(
-                    "Resposta:",
+                    "Locatário: ",
+                    fontSize = 14.sp,
                     fontWeight = FontWeight.SemiBold,
-                    fontSize = 13.sp,
+                    color = Color(0xFF333333),
                     modifier = Modifier.padding(top = 8.dp),
                     fontFamily = montserratFont()
                 )
+
                 Text(
-                    report.response,
-                    fontSize = 12.sp,
-                    color = Color(0xFF444444),
+                    "${report.tenant.firstName}  ${report.tenant.lastName}",
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = Color(0xFF333333),
+                    modifier = Modifier.padding(top = 8.dp),
                     fontFamily = montserratFont()
                 )
             }
 
-            Text(
-                "Inquilino: ${report.tenant.firstName}  ${report.tenant.lastName}",
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Medium,
-                color = Color(0xFF333333),
-                modifier = Modifier.padding(top = 8.dp),
-                fontFamily = montserratFont()
-            )
+            Row {
+                Text(
+                    "Imóvel: ",
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Color(0xFF333333),
+                    modifier = Modifier.padding(top = 8.dp),
+                    fontFamily = montserratFont()
+                )
 
-            Text(
-                "Imóvel: ${report.property.title}",
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Medium,
-                color = Color(0xFF333333),
-                modifier = Modifier.padding(top = 8.dp),
-                fontFamily = montserratFont()
-            )
+                Text(
+                    report.property.title,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = Color(0xFF333333),
+                    modifier = Modifier.padding(top = 8.dp),
+                    fontFamily = montserratFont()
+                )
+            }
         }
     }
 }
