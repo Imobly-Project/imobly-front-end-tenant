@@ -79,4 +79,8 @@ class LoginViewModel(private val navController: NavHostController): ViewModel() 
     fun changePassword(it: String) {
         password.value = it
     }
+
+    fun goToForgotPassword() {
+        navController.navigate("forgotpassword")
+    }
 }

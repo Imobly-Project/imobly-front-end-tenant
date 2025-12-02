@@ -19,8 +19,8 @@ import io.ktor.http.isSuccess
 class ReportHttpClient(val httpClient: HttpClient) {
     val baseUrl = "/reportacoes"
 
-    suspend fun searchAByProfileAndTitleOrMessage(titleOrMessage: String? = ""): List<Report> {
-        val response = httpClient.get("$baseUrl/encontrarporperfil?titulooumensagem=$titleOrMessage") {
+    suspend fun searchAByProfileAndTitleOrMessage(titleOrMessageOrName: String? = ""): List<Report> {
+        val response = httpClient.get("$baseUrl/encontrarporperfil?titulooumensagemounome=$titleOrMessageOrName") {
             header("Authorization", "Bearer $TOKEN")
         }
         return response.body()

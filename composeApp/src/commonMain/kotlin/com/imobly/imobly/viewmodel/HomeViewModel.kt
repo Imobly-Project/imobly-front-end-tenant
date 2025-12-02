@@ -42,6 +42,10 @@ class HomeViewModel(private val navController: NavHostController): ViewModel() {
         navController.navigate("showproperties")
     }
 
+    fun goToSendEmail() {
+        navController.navigate("sendemail")
+    }
+
     fun goToShowReports() {
         if (isLogged())
             navController.navigate("showreports")
