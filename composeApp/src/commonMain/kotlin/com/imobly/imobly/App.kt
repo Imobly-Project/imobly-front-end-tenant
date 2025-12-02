@@ -10,8 +10,10 @@ import com.imobly.imobly.ui.screens.appointments.CreateAppointmentScreen
 import com.imobly.imobly.ui.screens.createreport.CreateReportScreen
 import com.imobly.imobly.ui.screens.profile.ProfileScreen
 import com.imobly.imobly.ui.screens.home.HomeScreen
+import com.imobly.imobly.ui.screens.installments.InstallmentScreen
 import com.imobly.imobly.ui.screens.login.LoginScreen
 import com.imobly.imobly.ui.screens.showlease.ShowLeasesScreen
+import com.imobly.imobly.ui.screens.showpayments.ShowPaymentsScreen
 import com.imobly.imobly.ui.screens.showreports.ShowReportsScreen
 import com.imobly.imobly.ui.screens.showproperties.ShowPropertiesScreen
 import com.imobly.imobly.ui.screens.signup.SignUpScreen
@@ -19,6 +21,7 @@ import com.imobly.imobly.viewmodel.AppointmentViewModel
 import com.imobly.imobly.viewmodel.HomeViewModel
 import com.imobly.imobly.viewmodel.LeaseViewModel
 import com.imobly.imobly.viewmodel.LoginViewModel
+import com.imobly.imobly.viewmodel.PaymentViewModel
 import com.imobly.imobly.viewmodel.PropertyViewModel
 import com.imobly.imobly.viewmodel.ReportViewModel
 import com.imobly.imobly.viewmodel.TenantViewModel
@@ -35,6 +38,7 @@ fun App() {
     val leaseViewModel = viewModel { LeaseViewModel(navController) }
     val homeViewModel = viewModel { HomeViewModel(navController) }
     val appointmentViewModel = viewModel { AppointmentViewModel(navController) }
+    val paymentViewModel= viewModel { PaymentViewModel(navController) }
 
     MaterialTheme {
         NavHost(navController = navController, startDestination = "home") {
@@ -69,6 +73,14 @@ fun App() {
 
             composable(route = "showleases") {
                 ShowLeasesScreen(leaseViewModel)
+            }
+
+            composable(route = "showpayments") {
+                ShowPaymentsScreen(paymentViewModel)
+            }
+
+            composable(route = "installment") {
+                InstallmentScreen(paymentViewModel)
             }
 
             composable(route = "createappointment") {

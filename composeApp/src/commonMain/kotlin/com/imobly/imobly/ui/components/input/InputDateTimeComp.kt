@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -21,16 +22,19 @@ import com.imobly.imobly.ui.theme.colors.BackGroundColor
 import com.imobly.imobly.ui.theme.colors.CancelColor
 import com.imobly.imobly.ui.theme.colors.PrimaryColor
 import com.imobly.imobly.ui.theme.fonts.montserratFont
+import kotlinx.datetime.Instant
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.number
 import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import kotlin.time.ExperimentalTime
-import kotlin.time.Instant
+
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalTime::class)
 @Composable
-fun InputDateComp(
+fun InputDateTimeComp(
     label: String,
     value: String,
     onValueChange: (String) -> Unit,
@@ -39,15 +43,19 @@ fun InputDateComp(
     readOnly: Boolean = false,
     modifier: Modifier = Modifier.padding(16.dp).fillMaxWidth()
 ) {
-    var showPicker by remember { mutableStateOf(false) }
+    var showDatePicker by remember { mutableStateOf(false) }
+    var showTimePicker by remember { mutableStateOf(false) }
     var showError by remember { mutableStateOf(false) }
+
+    var tempDate by remember { mutableStateOf<LocalDate?>(null) }
 
     val borderColor = when {
         isError || showError -> Color.Red
         else -> PrimaryColor
     }
 
-    val displayValue = value.ifEmpty { "DD/MM/AAAA" }
+    val placeholder = "DD/MM/AAAA HH:MM"
+    val displayValue = value.ifEmpty { placeholder }
     val contentColor = if (value.isEmpty()) PrimaryColor.copy(alpha = 0.5f) else Color.Black
 
     Column(modifier = modifier) {
@@ -67,7 +75,7 @@ fun InputDateComp(
                 .background(BackGroundColor)
                 .border(1.dp, borderColor, RoundedCornerShape(10.dp))
                 .clickable(enabled = !readOnly) {
-                    showPicker = true
+                    showDatePicker = true
                 }
                 .padding(
                     vertical = 16.dp,
@@ -86,22 +94,22 @@ fun InputDateComp(
             )
 
             Icon(
-                imageVector = Icons.Filled.DateRange,
-                contentDescription = "Selecionar data",
+                imageVector = if (value.isEmpty()) Icons.Filled.DateRange else Icons.Filled.Schedule,
+                contentDescription = "Selecionar data e hora",
                 tint = PrimaryColor
             )
         }
 
         if (isError || showError) {
-            MessageErrorComp(if (showError) "Data inválida" else errorMessage)
+            MessageErrorComp(if (showError) "Data/Hora inválida" else errorMessage)
         }
 
-        if (showPicker) {
+        if (showDatePicker) {
             val datePickerState = rememberDatePickerState()
 
             DatePickerDialog(
                 onDismissRequest = {
-                    showPicker = false
+                    showDatePicker = false
                     showError = false
                 },
                 confirmButton = {
@@ -109,45 +117,37 @@ fun InputDateComp(
                         onClick = {
                             val millis = datePickerState.selectedDateMillis
                             if (millis != null) {
-                                val date = Instant.fromEpochMilliseconds(millis)
+                                tempDate = Instant.fromEpochMilliseconds(millis)
                                     .toLocalDateTime(TimeZone.UTC)
                                     .date
 
-                                val formatted =
-                                    "${date.day.toString().padStart(2, '0')}/" +
-                                            "${date.month.number.toString().padStart(2, '0')}/" +
-                                            "${date.year}"
-
-                                onValueChange(formatted)
-                                showPicker = false
+                                showDatePicker = false
+                                showTimePicker = true
                                 showError = false
                             } else {
                                 showError = true
                             }
                         }
                     ) {
-                        Text("OK", color = PrimaryColor, fontFamily = montserratFont())
+                        Text("PRÓXIMO", color = PrimaryColor, fontFamily = montserratFont())
                     }
                 },
                 dismissButton = {
                     TextButton(
                         onClick = {
-                            showPicker = false
+                            showDatePicker = false
                             showError = false
                         }
                     ) {
                         Text("Cancelar", color = CancelColor, fontFamily = montserratFont())
                     }
-                },
-                colors = DatePickerDefaults.colors(
-                    containerColor = BackGroundColor
-                )
+                }
             ) {
                 DatePicker(
                     state = datePickerState,
                     headline = {
                         Text(
-                            text = label,
+                            text = "Selecione a Data",
                             color = PrimaryColor,
                             fontFamily = montserratFont(),
                             modifier = Modifier.padding(16.dp)
@@ -158,29 +158,91 @@ fun InputDateComp(
                         todayDateBorderColor = PrimaryColor,
                         selectedDayContentColor = Color.White,
                         selectedDayContainerColor = PrimaryColor,
-                        dayContentColor = PrimaryColor,
                         containerColor = BackGroundColor,
                     )
                 )
             }
+        }
+
+        if (showTimePicker && tempDate != null) {
+            val timePickerState = rememberTimePickerState()
+
+            AlertDialog(
+                onDismissRequest = {
+                    showTimePicker = false
+                    tempDate = null
+                    showError = false
+                },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            val selectedTime = LocalTime(
+                                hour = timePickerState.hour,
+                                minute = timePickerState.minute
+                            )
+
+                            val date = tempDate!!
+
+                            val formatted =
+                                "${date.day.toString().padStart(2, '0')}/" +
+                                        "${date.month.number.toString().padStart(2, '0')}/" +
+                                        "${date.year} " +
+                                        "${selectedTime.hour.toString().padStart(2, '0')}:" +
+                                        "${selectedTime.minute.toString().padStart(2, '0')}"
+
+                            onValueChange(formatted)
+                            showTimePicker = false
+                            tempDate = null
+                            showError = false
+                        }
+                    ) {
+                        Text("OK", color = PrimaryColor, fontFamily = montserratFont())
+                    }
+                },
+                dismissButton = {
+                    TextButton(
+                        onClick = {
+                            showTimePicker = false
+                            tempDate = null
+                            showError = false
+                        }
+                    ) {
+                        Text("Cancelar", color = CancelColor, fontFamily = montserratFont())
+                    }
+                },
+                title = { Text("Selecione a Hora", fontFamily = montserratFont(), color = PrimaryColor) },
+                text = {
+                    TimePicker(
+                        state = timePickerState,
+                        colors = TimePickerDefaults.colors(
+                            containerColor = BackGroundColor,
+                            selectorColor = PrimaryColor,
+                            clockDialColor = PrimaryColor.copy(alpha = 0.2f),
+                            periodSelectorSelectedContainerColor = PrimaryColor,
+                            periodSelectorSelectedContentColor = Color.White
+                        )
+                    )
+                },
+                containerColor = BackGroundColor,
+            )
         }
     }
 }
 
 @Preview
 @Composable
-fun InputDateCompPreview() {
+fun InputDateTimeCompPreview() {
     Column(
         Modifier
             .fillMaxSize()
             .padding(20.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        var dateValue by remember { mutableStateOf("") }
-        InputDateComp(
-            label = "Data de Nascimento",
-            value = dateValue,
-            onValueChange = { dateValue = it }
+        var dateTimeValue by remember { mutableStateOf("") }
+        InputDateTimeComp(
+            label = "Agendar Visita",
+            value = dateTimeValue,
+            onValueChange = { dateTimeValue = it }
         )
     }
 }
