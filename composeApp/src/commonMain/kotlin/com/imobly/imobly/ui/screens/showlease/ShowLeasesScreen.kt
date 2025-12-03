@@ -119,7 +119,7 @@ fun LeaseCard(lease: Lease, leaseViewModel: LeaseViewModel) {
                     "Ver pagamentos",
                     { Icon(Icons.Default.Money, "Dinheiro") },
                     PrimaryColor,
-                    { leaseViewModel.goToShowPayments() }
+                    { leaseViewModel.goToShowPayments(lease) }
                 )
             }
         }

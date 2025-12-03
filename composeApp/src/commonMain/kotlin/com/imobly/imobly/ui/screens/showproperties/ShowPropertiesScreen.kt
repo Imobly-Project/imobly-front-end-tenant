@@ -1,33 +1,18 @@
 package com.imobly.imobly.ui.screens.showproperties
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBars
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Divider
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Bathtub
-import androidx.compose.material.icons.filled.Bed
-import androidx.compose.material.icons.filled.CalendarToday
-import androidx.compose.material.icons.filled.Garage
-import androidx.compose.material.icons.filled.Money
-import androidx.compose.material.icons.filled.SquareFoot
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -41,22 +26,25 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.rememberNavController
 import com.imobly.imobly.domain.Property
 import com.imobly.imobly.ui.components.button.ButtonComp
+import com.imobly.imobly.ui.components.input.InputComp
 import com.imobly.imobly.ui.components.searchbar.SearchBarComp
 import com.imobly.imobly.ui.components.title.TitleComp
 import com.imobly.imobly.ui.components.topbar.TopBarComp
-import com.imobly.imobly.ui.theme.colors.BackGroundColor
-import com.imobly.imobly.ui.theme.colors.PrimaryColor
+import com.imobly.imobly.ui.theme.colors.*
 import com.imobly.imobly.ui.theme.fonts.montserratFont
 import com.imobly.imobly.viewmodel.PropertyViewModel
 import io.kamel.image.KamelImage
 import io.kamel.image.asyncPainterResource
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
 fun ShowPropertiesScreen(propertyViewModel: PropertyViewModel) {
 
     val properties: MutableState<List<Property>> = remember { propertyViewModel.properties }
-    propertyViewModel.findAllAction()
+    LaunchedEffect(Unit) {
+        propertyViewModel.findAllAction()
+    }
 
     Scaffold(
         topBar = { TopBarComp() },
@@ -102,13 +90,20 @@ fun ShowPropertiesScreen(propertyViewModel: PropertyViewModel) {
                     Spacer(modifier = Modifier.height(10.dp))
 
 
+                    Box(modifier = Modifier.fillMaxWidth(),
+                        contentAlignment = Alignment.Center){
+                        FilterModal(propertyViewModel)
+                    }
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
                     LazyColumn(
                         modifier = Modifier
                             .fillMaxWidth(),
                         verticalArrangement = Arrangement.spacedBy(20.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        items(properties.value) { property ->
+                        items(propertyViewModel.filteredProperties.value) { property ->
                             PropertyCardComp(property, propertyViewModel)
                         }
                     }
@@ -263,6 +258,251 @@ fun TextInfoComp(text: String, icon: @Composable () -> Unit) {
     )
 }
 
+@Composable
+fun CustomRangeSlider(onRangeChanged: (Float, Float) -> Unit) {
+    var sliderPosition by remember { mutableStateOf(0f..400f) }
+
+    Column(
+        modifier = Modifier.fillMaxWidth().padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(text = "Filtrar por área", fontFamily = montserratFont())
+
+        RangeSlider(
+            value = sliderPosition,
+            steps = 7,
+            onValueChange = { range -> sliderPosition = range },
+            valueRange = 0f..400f,
+            onValueChangeFinished = {
+                onRangeChanged(sliderPosition.start, sliderPosition.endInclusive)
+
+            },
+            colors = SliderDefaults.colors(
+                activeTickColor = PrimaryColor,
+                activeTrackColor = PrimaryColor,
+                inactiveTrackColor = DisabledColor,
+                thumbColor = PrimaryColor,
+                inactiveTickColor = TitleColor,
+                disabledActiveTickColor = TitleColor,
+                disabledInactiveTickColor = TitleColor
+            )
+        )
+        Text(text = "De ${sliderPosition.start} m² até ${sliderPosition.endInclusive} m²", fontFamily = montserratFont())
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ChipComp(
+    title : String,
+    options:List<Int>,
+    selectedOption: Int,
+    onOptionSelected: (Int) -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .padding(horizontal = 20.dp, vertical = 10.dp)
+            .fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+
+        Text(
+            text = title,
+            fontSize = 16.sp,
+            fontFamily = montserratFont(),
+            color = Color(0xFF333333),
+            modifier = Modifier.padding(bottom = 12.dp)
+        )
+
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterHorizontally),
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            options.forEach { filter ->
+
+                val isSelected = selectedOption == filter
+
+                FilterChip(
+                    selected = isSelected,
+                    onClick = {
+                        if (isSelected) {
+                            onOptionSelected(0)
+                        } else {
+                            onOptionSelected(filter)
+                        }
+                              },
+                    label = {
+                        Text(
+                            text = filter.toString(),
+                            fontFamily = montserratFont(),
+                            fontWeight = FontWeight.SemiBold
+                        )
+                    },
+                    leadingIcon = {
+//                        if (isSelected)
+//                            Icon(
+//                                Icons.Default.Check,
+//                                contentDescription = null,
+//                                tint = Color.White
+//                            )
+                    },
+                    modifier = Modifier.height(40.dp),
+                    shape = RoundedCornerShape(14.dp),
+                    colors = FilterChipDefaults.filterChipColors(
+                        selectedContainerColor = PrimaryColor,
+                        selectedLabelColor = Color.White,
+                        containerColor = BackGroundColor,
+                        labelColor = TitleColor
+                    ),
+                    border = if (isSelected) null else
+                        FilterChipDefaults.filterChipBorder(
+                            borderColor = Color(0xFFBBBBBB),
+                            enabled = true,
+                            selected = isSelected
+                        )
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun AddressFilterField(
+    value: String,
+    onValueChange: (String) -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 20.dp, vertical = 10.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = "Filtrar por endereço:",
+            fontFamily = montserratFont(),
+            fontSize = 16.sp,
+            color = Color(0xFF333333),
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+
+        InputComp(
+            label = "Endereço:",
+            placeholder = "Digite bairro, rua, cidade...",
+            value = value,
+            onValueChange = onValueChange,
+            singleLine = true
+        )
+    }
+}
+
+@Composable
+fun PropertyFiltersComp(propertyViewModel: PropertyViewModel){
+    Box(Modifier.width(500.dp)) {
+
+        Column(Modifier.fillMaxWidth()){
+
+            CustomRangeSlider(
+                onRangeChanged = { start, end ->
+                    propertyViewModel.filterAreaStart.value = start
+                    propertyViewModel.filterAreaEnd.value = end
+                    propertyViewModel.applyFilter()
+                })
+
+            Spacer(Modifier.height(16.dp))
+
+            ChipComp(
+                title = "Nº de quartos",
+                options = propertyViewModel.filterValueOptions,
+                selectedOption = propertyViewModel.filterQuartos.value,
+                onOptionSelected = { newValue->
+                    propertyViewModel.filterQuartos.value = newValue
+                    propertyViewModel.applyFilter()
+                }
+            )
+
+            Spacer(Modifier.height(16.dp))
+
+            ChipComp(
+                title = "Nº de vagas na garagem",
+                options = propertyViewModel.filterValueOptions,
+                selectedOption = propertyViewModel.filterGaragem.value,
+                onOptionSelected = { newValue->
+                    propertyViewModel.filterGaragem.value = newValue
+                    propertyViewModel.applyFilter()
+                }
+            )
+
+            Spacer(Modifier.height(16.dp))
+
+            ChipComp(
+                title = "Nº de banheiros",
+                options = propertyViewModel.filterValueOptions,
+                selectedOption = propertyViewModel.filterBanheiros.value,
+                onOptionSelected = { newValue->
+                    propertyViewModel.filterBanheiros.value = newValue
+                    propertyViewModel.applyFilter()
+                }
+            )
+
+            Spacer(Modifier.height(16.dp))
+
+            AddressFilterField(
+                value = propertyViewModel.filterEndereco.value,
+                onValueChange = {
+                    propertyViewModel.filterEndereco.value = it
+                    propertyViewModel.applyFilter()
+                }
+            )
+
+            HorizontalDivider()
+
+        }
+
+
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun FilterModal(propertyViewModel: PropertyViewModel){
+    val sheetState = rememberModalBottomSheetState()
+    val scope = rememberCoroutineScope()
+    var showBottomSheet by remember { mutableStateOf(false) }
+
+    ButtonComp(
+        text = "Filtrar",
+        action = { showBottomSheet = true },
+        icon = {},
+        color = PrimaryColor
+    )
+    if (showBottomSheet) {
+        ModalBottomSheet(
+            containerColor = BackGroundColor,
+            onDismissRequest = {
+                showBottomSheet = false
+            },
+            sheetState = sheetState
+        ) {
+            Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).imePadding(), horizontalAlignment = Alignment.CenterHorizontally) {
+
+                PropertyFiltersComp(propertyViewModel)
+
+                ButtonComp(
+                    action = {
+                        scope.launch { sheetState.hide() }.invokeOnCompletion {
+                            if (!sheetState.isVisible) {
+                                showBottomSheet = false
+                            }
+                        }
+                    },
+                    text = "Fechar",
+                    icon = { Icon(Icons.Default.Cancel, "fechar") },
+                    color = CancelColor
+                )
+            }
+        }
+    }
+}
 @Preview
 @Composable
 fun ShowPropertiesPreview() {

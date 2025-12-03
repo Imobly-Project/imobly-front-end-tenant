@@ -12,11 +12,13 @@ import com.imobly.imobly.ui.screens.changeemail.sendemail.SendEmailScreen
 import com.imobly.imobly.ui.screens.createreport.CreateReportScreen
 import com.imobly.imobly.ui.screens.profile.ProfileScreen
 import com.imobly.imobly.ui.screens.home.HomeScreen
+import com.imobly.imobly.ui.screens.installments.InstallmentScreen
 import com.imobly.imobly.ui.screens.login.LoginScreen
 import com.imobly.imobly.ui.screens.recoverypassword.changepassword.ChangePasswordScreen
 import com.imobly.imobly.ui.screens.recoverypassword.forgotpassword.ForgotPasswordScreen
 import com.imobly.imobly.ui.screens.recoverypassword.insertcode.InsertCodeScreen
 import com.imobly.imobly.ui.screens.showlease.ShowLeasesScreen
+import com.imobly.imobly.ui.screens.showpayments.ShowPaymentsScreen
 import com.imobly.imobly.ui.screens.showreports.ShowReportsScreen
 import com.imobly.imobly.ui.screens.showproperties.ShowPropertiesScreen
 import com.imobly.imobly.ui.screens.signup.SignUpScreen
@@ -25,6 +27,7 @@ import com.imobly.imobly.viewmodel.ChangeEmailViewModel
 import com.imobly.imobly.viewmodel.HomeViewModel
 import com.imobly.imobly.viewmodel.LeaseViewModel
 import com.imobly.imobly.viewmodel.LoginViewModel
+import com.imobly.imobly.viewmodel.PaymentViewModel
 import com.imobly.imobly.viewmodel.PropertyViewModel
 import com.imobly.imobly.viewmodel.ReportViewModel
 import com.imobly.imobly.viewmodel.ResetPasswordViewModel
@@ -42,6 +45,7 @@ fun App() {
     val leaseViewModel = viewModel { LeaseViewModel(navController) }
     val homeViewModel = viewModel { HomeViewModel(navController) }
     val appointmentViewModel = viewModel { AppointmentViewModel(navController) }
+    val paymentViewModel= viewModel { PaymentViewModel(navController) }
     val resetPasswordViewModel = viewModel { ResetPasswordViewModel(navController) }
     val changeEmailViewModel = viewModel { ChangeEmailViewModel(navController) }
 
@@ -78,6 +82,14 @@ fun App() {
 
             composable(route = "showleases") {
                 ShowLeasesScreen(leaseViewModel)
+            }
+
+            composable(route = "showpayments") {
+                ShowPaymentsScreen(paymentViewModel)
+            }
+
+            composable(route = "installment") {
+                InstallmentScreen(paymentViewModel)
             }
 
             composable(route = "createappointment") {

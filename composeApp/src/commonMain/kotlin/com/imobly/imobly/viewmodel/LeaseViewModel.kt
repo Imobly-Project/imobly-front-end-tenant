@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import com.imobly.imobly.api.createHttpClient
 import com.imobly.imobly.api.httpclient.LeaseHttpClient
+import com.imobly.imobly.api.httpclient.PaymentHttpClient
 import com.imobly.imobly.domain.Lease
 import kotlinx.coroutines.launch
 
@@ -43,7 +44,14 @@ class LeaseViewModel(private val navController: NavHostController): ViewModel() 
         navController.navigate("home")
     }
 
-    fun goToShowPayments() {
-
+    fun goToShowPayments(lease: Lease) {
+        viewModelScope.launch {
+            if (lease.id != null) {
+                val httpClient = PaymentHttpClient(createHttpClient())
+                val payment = httpClient.searchByLeaseId(lease.id)
+                SharedRepository.payment = payment
+                navController.navigate("showpayments")
+            }
+        }
     }
 }
