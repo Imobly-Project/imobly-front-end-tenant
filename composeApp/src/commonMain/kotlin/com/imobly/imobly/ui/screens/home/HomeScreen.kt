@@ -181,26 +181,26 @@ fun HomeScreen(homeViewModel: HomeViewModel) {
 
                             )
                         }
-
-                        item {
-                            CardButtonComp(
-                                text = "Trocar o E-mail",
-                                icon = {
-                                    Icon(
-                                        Icons.Default.Email,
-                                        contentDescription = "Email",
-                                        modifier = Modifier.fillMaxSize().padding(20.dp),
-                                        tint = backgroundColor,
-                                    )
-                                },
-                                action = { homeViewModel.goToSendEmail() },
-                                backgroundColor = backgroundColor,
-                                highlightColor = highlightColor
-
-                            )
-                        }
-
                         if (homeViewModel.isLogged()) {
+
+                            item {
+                                CardButtonComp(
+                                    text = "Trocar o E-mail",
+                                    icon = {
+                                        Icon(
+                                            Icons.Default.Email,
+                                            contentDescription = "Email",
+                                            modifier = Modifier.fillMaxSize().padding(20.dp),
+                                            tint = backgroundColor,
+                                        )
+                                    },
+                                    action = { homeViewModel.goToSendEmail() },
+                                    backgroundColor = backgroundColor,
+                                    highlightColor = highlightColor
+
+                                )
+                            }
+
                             item {
                                 CardButtonComp(
                                     text = "Deslogar",
