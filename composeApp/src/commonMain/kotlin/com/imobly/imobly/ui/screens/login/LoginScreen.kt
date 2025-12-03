@@ -135,7 +135,7 @@ fun LoginScreen(loginViewModel: LoginViewModel) {
                             "Esqueceu a senha?",
                             fontFamily = montserratFont(),
                             fontWeight = FontWeight.Medium,
-                            modifier = Modifier.clickable {  }
+                            modifier = Modifier.clickable { loginViewModel.goToForgotPassword() }
                         )
                     }
 

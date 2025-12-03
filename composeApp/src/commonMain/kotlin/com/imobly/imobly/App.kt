@@ -7,23 +7,30 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.imobly.imobly.ui.screens.appointments.CreateAppointmentScreen
+import com.imobly.imobly.ui.screens.changeemail.sendcode.SendCodeScreen
+import com.imobly.imobly.ui.screens.changeemail.sendemail.SendEmailScreen
 import com.imobly.imobly.ui.screens.createreport.CreateReportScreen
 import com.imobly.imobly.ui.screens.profile.ProfileScreen
 import com.imobly.imobly.ui.screens.home.HomeScreen
 import com.imobly.imobly.ui.screens.installments.InstallmentScreen
 import com.imobly.imobly.ui.screens.login.LoginScreen
+import com.imobly.imobly.ui.screens.recoverypassword.changepassword.ChangePasswordScreen
+import com.imobly.imobly.ui.screens.recoverypassword.forgotpassword.ForgotPasswordScreen
+import com.imobly.imobly.ui.screens.recoverypassword.insertcode.InsertCodeScreen
 import com.imobly.imobly.ui.screens.showlease.ShowLeasesScreen
 import com.imobly.imobly.ui.screens.showpayments.ShowPaymentsScreen
 import com.imobly.imobly.ui.screens.showreports.ShowReportsScreen
 import com.imobly.imobly.ui.screens.showproperties.ShowPropertiesScreen
 import com.imobly.imobly.ui.screens.signup.SignUpScreen
 import com.imobly.imobly.viewmodel.AppointmentViewModel
+import com.imobly.imobly.viewmodel.ChangeEmailViewModel
 import com.imobly.imobly.viewmodel.HomeViewModel
 import com.imobly.imobly.viewmodel.LeaseViewModel
 import com.imobly.imobly.viewmodel.LoginViewModel
 import com.imobly.imobly.viewmodel.PaymentViewModel
 import com.imobly.imobly.viewmodel.PropertyViewModel
 import com.imobly.imobly.viewmodel.ReportViewModel
+import com.imobly.imobly.viewmodel.ResetPasswordViewModel
 import com.imobly.imobly.viewmodel.TenantViewModel
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -39,6 +46,8 @@ fun App() {
     val homeViewModel = viewModel { HomeViewModel(navController) }
     val appointmentViewModel = viewModel { AppointmentViewModel(navController) }
     val paymentViewModel= viewModel { PaymentViewModel(navController) }
+    val resetPasswordViewModel = viewModel { ResetPasswordViewModel(navController) }
+    val changeEmailViewModel = viewModel { ChangeEmailViewModel(navController) }
 
     MaterialTheme {
         NavHost(navController = navController, startDestination = "home") {
@@ -85,6 +94,26 @@ fun App() {
 
             composable(route = "createappointment") {
                 CreateAppointmentScreen(appointmentViewModel)
+            }
+
+            composable(route = "forgotpassword") {
+                ForgotPasswordScreen(resetPasswordViewModel)
+            }
+
+            composable(route = "insertcode") {
+                InsertCodeScreen(resetPasswordViewModel)
+            }
+
+            composable(route = "changepassword") {
+                ChangePasswordScreen(resetPasswordViewModel)
+            }
+
+            composable(route = "sendemail") {
+                SendEmailScreen(changeEmailViewModel)
+            }
+
+            composable(route = "sendcode") {
+                SendCodeScreen(changeEmailViewModel)
             }
         }
     }

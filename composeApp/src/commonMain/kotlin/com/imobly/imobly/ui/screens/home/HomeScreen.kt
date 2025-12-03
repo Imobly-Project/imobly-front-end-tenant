@@ -21,6 +21,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
+import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.outlined.Feedback
 import androidx.compose.material.icons.outlined.ManageAccounts
@@ -180,6 +181,25 @@ fun HomeScreen(homeViewModel: HomeViewModel) {
 
                             )
                         }
+
+                        item {
+                            CardButtonComp(
+                                text = "Trocar o E-mail",
+                                icon = {
+                                    Icon(
+                                        Icons.Default.Email,
+                                        contentDescription = "Email",
+                                        modifier = Modifier.fillMaxSize().padding(20.dp),
+                                        tint = backgroundColor,
+                                    )
+                                },
+                                action = { homeViewModel.goToSendEmail() },
+                                backgroundColor = backgroundColor,
+                                highlightColor = highlightColor
+
+                            )
+                        }
+
                         if (homeViewModel.isLogged()) {
                             item {
                                 CardButtonComp(
@@ -209,18 +229,18 @@ fun HomeScreen(homeViewModel: HomeViewModel) {
 fun CardButtonComp(
     text: String,
     width: Dp = 200.dp,
-    icon : @Composable ()-> Unit,
+    icon: @Composable () -> Unit,
     backgroundColor: Color = BackGroundColor,
-    highlightColor:Color = PrimaryColor,
-    action: ()-> Unit
-){
+    highlightColor: Color = PrimaryColor,
+    action: () -> Unit
+) {
     OutlinedCard(
         modifier = Modifier
             .width(width)
             .height(100.dp),
         onClick = action,
 
-        ){
+        ) {
         Row {
             Column(
                 Modifier.background(highlightColor)
@@ -228,7 +248,7 @@ fun CardButtonComp(
                     .fillMaxHeight(),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
-            ){
+            ) {
                 icon()
             }
 
@@ -238,7 +258,7 @@ fun CardButtonComp(
                     .fillMaxHeight(),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
-            ){
+            ) {
                 Text(
                     text = text,
                     textAlign = TextAlign.Center,
