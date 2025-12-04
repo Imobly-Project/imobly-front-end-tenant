@@ -12,7 +12,7 @@ import com.imobly.imobly.ui.screens.changeemail.sendemail.SendEmailScreen
 import com.imobly.imobly.ui.screens.createreport.CreateReportScreen
 import com.imobly.imobly.ui.screens.profile.ProfileScreen
 import com.imobly.imobly.ui.screens.home.HomeScreen
-import com.imobly.imobly.ui.screens.installments.InstallmentScreen
+import com.imobly.imobly.ui.screens.installment.InstallmentScreen
 import com.imobly.imobly.ui.screens.login.LoginScreen
 import com.imobly.imobly.ui.screens.recoverypassword.changepassword.ChangePasswordScreen
 import com.imobly.imobly.ui.screens.recoverypassword.forgotpassword.ForgotPasswordScreen

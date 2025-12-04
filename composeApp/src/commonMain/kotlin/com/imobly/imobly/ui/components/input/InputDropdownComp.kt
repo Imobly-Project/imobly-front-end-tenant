@@ -5,7 +5,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.MenuAnchorType
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -34,29 +41,26 @@ fun InputDropdownComp(
     onOptionSelected: (String) -> Unit,
     isError: Boolean = false,
     errorMessage: String = "",
-    readOnly: Boolean = false,
     isEnabled: Boolean = true,
     modifier: Modifier = Modifier.padding(16.dp).fillMaxWidth()
 ) {
     var expanded by remember { mutableStateOf(false) }
 
-    // Cores baseadas no estado readOnly
-    val textColor = if (readOnly) DisabledColor else Color.Black
-    val labelColor = if (readOnly) DisabledColor else PrimaryColor
-    val indicatorColor = if (readOnly) DisabledColor else PrimaryColor
-    val backgroundColor = if (readOnly) BackGroundColor.copy(alpha = 0.5f) else BackGroundColor
+    val textColor = if (!isEnabled) DisabledColor else Color.Black
+    val labelColor = if (!isEnabled) DisabledColor else PrimaryColor
+    val indicatorColor = if (!isEnabled) DisabledColor else PrimaryColor
+    val backgroundColor = if (!isEnabled) BackGroundColor.copy(alpha = 0.5f) else BackGroundColor
 
     ExposedDropdownMenuBox(
         expanded = expanded,
         onExpandedChange = {
-            if (isEnabled && !readOnly) expanded = !expanded
+            if (isEnabled) expanded = !expanded
         }
     ) {
         OutlinedTextField(
             value = selectedOption,
             onValueChange = {},
-            readOnly = true,
-            enabled = !readOnly,
+            enabled = isEnabled,
             label = {
                 Text(
                     label,
@@ -73,9 +77,7 @@ fun InputDropdownComp(
                 fontWeight = FontWeight.Bold,
                 color = textColor
             ),
-            modifier = modifier
-                .fillMaxWidth()
-                .menuAnchor(),  // Corrigido: Removido os parâmetros obsoletos
+            modifier = modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable, isEnabled),
             colors = TextFieldDefaults.colors(
                 unfocusedTextColor = textColor,
                 unfocusedLabelColor = labelColor,
@@ -85,14 +87,16 @@ fun InputDropdownComp(
                 focusedTextColor = textColor,
                 focusedLabelColor = labelColor,
                 focusedIndicatorColor = indicatorColor,
-                cursorColor = if (readOnly) Color.Transparent else PrimaryColor,
+                cursorColor = if (!isEnabled) Color.Transparent else PrimaryColor,
                 disabledTextColor = DisabledColor,
                 disabledLabelColor = DisabledColor,
                 disabledIndicatorColor = DisabledColor,
                 disabledContainerColor = BackGroundColor.copy(alpha = 0.5f)
             ),
             trailingIcon = {
-                ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                ExposedDropdownMenuDefaults.TrailingIcon(
+                    expanded = expanded
+                )
             }
         )
 
@@ -101,7 +105,7 @@ fun InputDropdownComp(
         }
 
         ExposedDropdownMenu(
-            expanded = expanded && isEnabled && !readOnly,
+            expanded = expanded && isEnabled,
             onDismissRequest = { expanded = false }
         ) {
             options.forEach { option ->
