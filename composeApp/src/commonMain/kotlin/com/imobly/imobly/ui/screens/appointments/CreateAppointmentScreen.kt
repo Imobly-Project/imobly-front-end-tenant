@@ -61,7 +61,7 @@ fun CreateAppointmentScreen(appointmentViewModel: AppointmentViewModel) {
             ) {
 
                 InputComp(
-                    label = "Visitante",
+                    label = "Seu nome",
                     placeholder = "Ex: Maria Souza",
                     value = appointmentViewModel.appointment.value.guestName,
                     onValueChange = { appointmentViewModel.changeGuestName(it) },
@@ -79,7 +79,7 @@ fun CreateAppointmentScreen(appointmentViewModel: AppointmentViewModel) {
                     )
 
                     InputComp(
-                        label = "Telefone",
+                        label = "Seu telefone",
                         placeholder = "Ex: (00) 90000-0000",
                         value = appointmentViewModel.appointment.value.telephone,
                         onValueChange = { appointmentViewModel.changeTelephone(it) },

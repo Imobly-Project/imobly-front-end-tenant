@@ -258,9 +258,8 @@ fun SignUpScreen(tenantViewModel: TenantViewModel) {
                             onOptionSelected = { selectedLabel ->
                                 tenantViewModel.tenant.value =
                                     tenantViewModel.tenant.value.copy(
-                                        maritalStatus = MaritalStatusEnum.entries.first { it.label == selectedLabel })
+                                        maritalStatus = MaritalStatusEnum.entries.first { it.name == selectedLabel })
                             },
-                            isEnabled = tenantViewModel.inputLockState.value
                         )
 
                         InputDateComp(
