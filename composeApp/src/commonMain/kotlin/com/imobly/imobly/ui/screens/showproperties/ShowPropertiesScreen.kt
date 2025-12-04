@@ -27,6 +27,7 @@ import androidx.navigation.compose.rememberNavController
 import com.imobly.imobly.domain.Property
 import com.imobly.imobly.ui.components.button.ButtonComp
 import com.imobly.imobly.ui.components.input.InputComp
+import com.imobly.imobly.ui.components.input.InputDropdownComp
 import com.imobly.imobly.ui.components.searchbar.SearchBarComp
 import com.imobly.imobly.ui.components.title.TitleComp
 import com.imobly.imobly.ui.components.topbar.TopBarComp
@@ -452,6 +453,27 @@ fun PropertyFiltersComp(propertyViewModel: PropertyViewModel){
                     propertyViewModel.filterEndereco.value = it
                     propertyViewModel.applyFilter()
                 }
+            )
+
+            InputDropdownComp(
+                label = "Categoria",
+                options = propertyViewModel.categoriesOptions(),
+                selectedOption = propertyViewModel.filterCategoria.value.title,
+                onOptionSelected = { selectedOptionId ->
+
+                    if (selectedOptionId == propertyViewModel.categoriaTodos.id) {
+                        propertyViewModel.clearCategoryFilter()
+                        return@InputDropdownComp
+                    }
+
+                    val category =
+                        propertyViewModel.categories.value.firstOrNull { it.id == selectedOptionId }
+
+                    if (category != null) {
+                        propertyViewModel.changeCategory(category)
+                    }
+                }
+
             )
 
             HorizontalDivider()

@@ -32,6 +32,15 @@ class PropertyViewModel(private val navController: NavHostController): ViewModel
     val filterGaragem = mutableStateOf(0)
     val filterBanheiros = mutableStateOf(0)
     val filterEndereco = mutableStateOf("")
+
+    val categoriaTodos = Category(
+        id = "",
+        title = "Todos"
+    )
+
+    var filterCategoria = mutableStateOf(categoriaTodos)
+
+
     val filterValueOptions = mutableStateListOf(1,2,3,4,5,6)
 
     fun applyFilter(){
@@ -51,8 +60,10 @@ class PropertyViewModel(private val navController: NavHostController): ViewModel
                     property.address.state.contains(filterEndereco.value, ignoreCase = true) ||
                     property.address.street.contains(filterEndereco.value, ignoreCase = true) ||
                     property.address.neighborhood.contains(filterEndereco.value, ignoreCase = true)
+            val categoriaOk =
+                filterCategoria.value.id!!.isBlank() || property.category.id == filterCategoria.value.id
 
-            areaOk && quartosOk && garagemOk && banheirosOk && enderecoOk
+            areaOk && quartosOk && garagemOk && banheirosOk && enderecoOk && categoriaOk
         }
 
         filteredProperties.value = list
@@ -88,6 +99,27 @@ class PropertyViewModel(private val navController: NavHostController): ViewModel
             properties.value = list
             applyFilter()
         }
+    }
+
+    fun categoriasParaFiltro(): List<Category> {
+        return listOf(categoriaTodos) + categories.value
+    }
+    fun categoriesOptions(): Map<String, String> {
+        val map = mutableMapOf<String, String>()
+        categoriasParaFiltro().forEach {
+            map[it.title] = it.id ?: ""
+        }
+        return map
+    }
+
+    fun changeCategory(category: Category) {
+        filterCategoria.value = category
+        applyFilter()
+    }
+
+    fun clearCategoryFilter() {
+        filterCategoria.value = categoriaTodos
+        applyFilter()
     }
 
 }
