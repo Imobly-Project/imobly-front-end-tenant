@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.sp
 import com.imobly.imobly.ui.components.messageerror.MessageErrorComp
 import com.imobly.imobly.ui.theme.colors.BackGroundColor
 import com.imobly.imobly.ui.theme.colors.CancelColor
+import com.imobly.imobly.ui.theme.colors.DisabledColor
 import com.imobly.imobly.ui.theme.colors.PrimaryColor
 import com.imobly.imobly.ui.theme.fonts.montserratFont
 import kotlinx.datetime.TimeZone
@@ -42,13 +43,23 @@ fun InputDateComp(
     var showPicker by remember { mutableStateOf(false) }
     var showError by remember { mutableStateOf(false) }
 
+    // Cores baseadas no estado readOnly
     val borderColor = when {
+        readOnly -> DisabledColor
         isError || showError -> Color.Red
         else -> PrimaryColor
     }
 
+    val labelColor = if (readOnly) DisabledColor else PrimaryColor
+    val backgroundColor = if (readOnly) BackGroundColor.copy(alpha = 0.5f) else BackGroundColor
+    val iconColor = if (readOnly) DisabledColor else PrimaryColor
+
     val displayValue = value.ifEmpty { "DD/MM/AAAA" }
-    val contentColor = if (value.isEmpty()) PrimaryColor.copy(alpha = 0.5f) else Color.Black
+    val contentColor = when {
+        readOnly -> DisabledColor
+        value.isEmpty() -> PrimaryColor.copy(alpha = 0.5f)
+        else -> Color.Black
+    }
 
     Column(modifier = modifier) {
         Text(
@@ -56,7 +67,7 @@ fun InputDateComp(
             fontFamily = montserratFont(),
             fontSize = 15.sp,
             fontWeight = FontWeight.ExtraBold,
-            color = PrimaryColor,
+            color = labelColor,
             modifier = Modifier.padding(start = 12.dp, bottom = 4.dp)
         )
 
@@ -64,10 +75,12 @@ fun InputDateComp(
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(10.dp))
-                .background(BackGroundColor)
+                .background(backgroundColor)
                 .border(1.dp, borderColor, RoundedCornerShape(10.dp))
                 .clickable(enabled = !readOnly) {
-                    showPicker = true
+                    if (!readOnly) {
+                        showPicker = true
+                    }
                 }
                 .padding(
                     vertical = 16.dp,
@@ -88,7 +101,7 @@ fun InputDateComp(
             Icon(
                 imageVector = Icons.Filled.DateRange,
                 contentDescription = "Selecionar data",
-                tint = PrimaryColor
+                tint = iconColor
             )
         }
 
@@ -96,7 +109,7 @@ fun InputDateComp(
             MessageErrorComp(if (showError) "Data inválida" else errorMessage)
         }
 
-        if (showPicker) {
+        if (showPicker && !readOnly) {
             val datePickerState = rememberDatePickerState()
 
             DatePickerDialog(

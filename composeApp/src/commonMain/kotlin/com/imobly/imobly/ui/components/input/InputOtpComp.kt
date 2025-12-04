@@ -17,6 +17,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.imobly.imobly.ui.components.messageerror.MessageErrorComp
+import com.imobly.imobly.ui.theme.colors.DisabledColor
 import com.imobly.imobly.ui.theme.colors.PrimaryColor
 import com.imobly.imobly.ui.theme.colors.TitleColor
 import com.imobly.imobly.ui.theme.fonts.montserratFont
@@ -29,15 +30,24 @@ fun InputOtpComp(
     onValueChange: (String) -> Unit,
     isError: Boolean = false,
     errorMessage: String = "",
+    readOnly: Boolean = false,
     modifier: Modifier = Modifier.padding(16.dp)
 ) {
-    Column(modifier = modifier) {
+    // Cores baseadas no estado readOnly
+    val labelColor = if (readOnly) DisabledColor else TitleColor
+    val borderColor = if (readOnly) DisabledColor else PrimaryColor
+    val activeBorderColor = if (readOnly) DisabledColor else PrimaryColor
+    val inactiveBorderColor = if (readOnly) DisabledColor.copy(alpha = 0.5f) else Color.LightGray
+    val textColor = if (readOnly) DisabledColor else TitleColor
+    val boxBackgroundColor = if (readOnly) Color.White.copy(alpha = 0.5f) else Color.White
 
+    Column(modifier = modifier) {
         if (label.isNotEmpty()) {
             Text(
                 text = label,
                 fontFamily = montserratFont(),
                 fontSize = 15.sp,
+                color = labelColor,
                 modifier = Modifier.padding(bottom = 8.dp)
             )
         }
@@ -45,7 +55,7 @@ fun InputOtpComp(
         BasicTextField(
             value = value,
             onValueChange = {
-                if (it.length <= otpLength && it.all { c -> c.isDigit() }) {
+                if (!readOnly && it.length <= otpLength && it.all { c -> c.isDigit() }) {
                     onValueChange(it)
                 }
             },
@@ -57,8 +67,8 @@ fun InputOtpComp(
                 color = Color.Transparent
             ),
             singleLine = true,
+            readOnly = readOnly,
             decorationBox = {
-
                 Row(
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically,
@@ -75,26 +85,26 @@ fun InputOtpComp(
                                 .size(48.dp)
                                 .border(
                                     width = when {
-                                        index == filledUntil -> 2.dp
+                                        index == filledUntil && !readOnly -> 2.dp
                                         else -> 1.dp
                                     },
                                     color = when {
-                                        index < filledUntil -> PrimaryColor
-                                        index == filledUntil -> PrimaryColor
-                                        else -> Color.LightGray
+                                        index < filledUntil -> borderColor
+                                        index == filledUntil && !readOnly -> activeBorderColor
+                                        else -> inactiveBorderColor
                                     },
                                     shape = RoundedCornerShape(8.dp)
                                 )
-                                .background(Color.White, RoundedCornerShape(8.dp)),
+                                .background(boxBackgroundColor, RoundedCornerShape(8.dp)),
                             contentAlignment = Alignment.Center
                         ) {
-                        Text(
-                            text = char,
-                            fontSize = 22.sp,
-                            fontFamily = montserratFont(),
-                            color = TitleColor,
-                            textAlign = TextAlign.Center
-                        )
+                            Text(
+                                text = char,
+                                fontSize = 22.sp,
+                                fontFamily = montserratFont(),
+                                color = textColor,
+                                textAlign = TextAlign.Center
+                            )
                         }
 
                         if (index < otpLength - 1) {

@@ -21,10 +21,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.imobly.imobly.ui.components.messageerror.MessageErrorComp
 import com.imobly.imobly.ui.theme.colors.BackGroundColor
+import com.imobly.imobly.ui.theme.colors.DisabledColor
 import com.imobly.imobly.ui.theme.colors.PrimaryColor
 import com.imobly.imobly.ui.theme.fonts.montserratFont
 import org.jetbrains.compose.ui.tooling.preview.Preview
-
 
 @Composable
 fun InputComp(
@@ -41,16 +41,29 @@ fun InputComp(
 ) {
     val numLines = if (singleLine) 1 else 4
 
+    // Cores baseadas no estado readOnly
+    val textColor = if (readOnly) DisabledColor else Color.Black
+    val labelColor = if (readOnly) DisabledColor else PrimaryColor
+    val indicatorColor = if (readOnly) DisabledColor else PrimaryColor
+    val placeholderColor = if (readOnly) DisabledColor.copy(alpha = 0.7f) else PrimaryColor
+    val backgroundColor = if (readOnly) BackGroundColor.copy(alpha = 0.5f) else BackGroundColor
+
     Column(
         modifier = modifier,
         verticalArrangement = Arrangement.Center
     ) {
         OutlinedTextField(
             label = {
-                Text(label, fontFamily = montserratFont(), fontSize = 15.sp, fontWeight = FontWeight.ExtraBold)
+                Text(
+                    label,
+                    fontFamily = montserratFont(),
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = labelColor
+                )
             },
             value = value,
-            onValueChange = onValueChange,
+            onValueChange = { if (!readOnly) onValueChange(it) },
             shape = RoundedCornerShape(10.dp),
             singleLine = singleLine,
             minLines = numLines,
@@ -59,20 +72,35 @@ fun InputComp(
             isError = isError,
             keyboardOptions = KeyboardOptions(keyboardType = if (isNumeric) KeyboardType.Number else KeyboardType.Text),
             placeholder = {
-                Text(placeholder, fontFamily = montserratFont(), fontSize = 15.sp, fontWeight = FontWeight.ExtraBold)
+                Text(
+                    placeholder,
+                    fontFamily = montserratFont(),
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = placeholderColor
+                )
             },
-            textStyle = TextStyle(fontFamily = montserratFont(), fontSize = 15.sp, fontWeight = FontWeight.Bold),
+            textStyle = TextStyle(
+                fontFamily = montserratFont(),
+                fontSize = 15.sp,
+                fontWeight = FontWeight.Bold,
+                color = textColor
+            ),
             modifier = Modifier.fillMaxWidth(),
             colors = TextFieldDefaults.colors(
-                unfocusedTextColor = Color.Black,
-                unfocusedLabelColor = PrimaryColor,
-                unfocusedIndicatorColor = PrimaryColor,
-                unfocusedContainerColor = BackGroundColor,
-                focusedContainerColor = BackGroundColor,
-                focusedTextColor = Color.Black,
-                focusedLabelColor = PrimaryColor,
-                focusedIndicatorColor = PrimaryColor,
-                cursorColor = PrimaryColor
+                unfocusedTextColor = textColor,
+                unfocusedLabelColor = labelColor,
+                unfocusedIndicatorColor = indicatorColor,
+                unfocusedContainerColor = backgroundColor,
+                focusedContainerColor = backgroundColor,
+                focusedTextColor = textColor,
+                focusedLabelColor = labelColor,
+                focusedIndicatorColor = indicatorColor,
+                cursorColor = if (readOnly) Color.Transparent else PrimaryColor,
+                disabledTextColor = DisabledColor,
+                disabledLabelColor = DisabledColor,
+                disabledIndicatorColor = DisabledColor,
+                disabledContainerColor = BackGroundColor.copy(alpha = 0.5f)
             )
         )
         if (isError) {

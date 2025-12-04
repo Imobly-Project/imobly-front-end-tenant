@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.sp
 import com.imobly.imobly.ui.components.messageerror.MessageErrorComp
 import com.imobly.imobly.ui.theme.colors.BackGroundColor
 import com.imobly.imobly.ui.theme.colors.CancelColor
+import com.imobly.imobly.ui.theme.colors.DisabledColor
 import com.imobly.imobly.ui.theme.colors.PrimaryColor
 import com.imobly.imobly.ui.theme.fonts.montserratFont
 import kotlinx.datetime.Instant
@@ -30,7 +31,6 @@ import kotlinx.datetime.number
 import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import kotlin.time.ExperimentalTime
-
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalTime::class)
 @Composable
@@ -49,14 +49,24 @@ fun InputDateTimeComp(
 
     var tempDate by remember { mutableStateOf<LocalDate?>(null) }
 
+    // Cores baseadas no estado readOnly
     val borderColor = when {
+        readOnly -> DisabledColor
         isError || showError -> Color.Red
         else -> PrimaryColor
     }
 
+    val labelColor = if (readOnly) DisabledColor else PrimaryColor
+    val backgroundColor = if (readOnly) BackGroundColor.copy(alpha = 0.5f) else BackGroundColor
+    val iconColor = if (readOnly) DisabledColor else PrimaryColor
+
     val placeholder = "DD/MM/AAAA HH:MM"
     val displayValue = value.ifEmpty { placeholder }
-    val contentColor = if (value.isEmpty()) PrimaryColor.copy(alpha = 0.5f) else Color.Black
+    val contentColor = when {
+        readOnly -> DisabledColor
+        value.isEmpty() -> PrimaryColor.copy(alpha = 0.5f)
+        else -> Color.Black
+    }
 
     Column(modifier = modifier) {
         Text(
@@ -64,7 +74,7 @@ fun InputDateTimeComp(
             fontFamily = montserratFont(),
             fontSize = 15.sp,
             fontWeight = FontWeight.ExtraBold,
-            color = PrimaryColor,
+            color = labelColor,
             modifier = Modifier.padding(start = 12.dp, bottom = 4.dp)
         )
 
@@ -72,10 +82,12 @@ fun InputDateTimeComp(
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(10.dp))
-                .background(BackGroundColor)
+                .background(backgroundColor)
                 .border(1.dp, borderColor, RoundedCornerShape(10.dp))
                 .clickable(enabled = !readOnly) {
-                    showDatePicker = true
+                    if (!readOnly) {
+                        showDatePicker = true
+                    }
                 }
                 .padding(
                     vertical = 16.dp,
@@ -96,7 +108,7 @@ fun InputDateTimeComp(
             Icon(
                 imageVector = if (value.isEmpty()) Icons.Filled.DateRange else Icons.Filled.Schedule,
                 contentDescription = "Selecionar data e hora",
-                tint = PrimaryColor
+                tint = iconColor
             )
         }
 
@@ -104,7 +116,7 @@ fun InputDateTimeComp(
             MessageErrorComp(if (showError) "Data/Hora inválida" else errorMessage)
         }
 
-        if (showDatePicker) {
+        if (showDatePicker && !readOnly) {
             val datePickerState = rememberDatePickerState()
 
             DatePickerDialog(
@@ -164,7 +176,7 @@ fun InputDateTimeComp(
             }
         }
 
-        if (showTimePicker && tempDate != null) {
+        if (showTimePicker && tempDate != null && !readOnly) {
             val timePickerState = rememberTimePickerState()
 
             AlertDialog(
