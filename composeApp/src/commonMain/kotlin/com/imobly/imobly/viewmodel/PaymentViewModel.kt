@@ -19,33 +19,9 @@ import kotlinx.coroutines.launch
 class PaymentViewModel(private val navController: NavHostController) : ViewModel() {
     val payment = mutableStateOf(Payment())
 
-    val monthlyInstallment = mutableStateOf(MonthlyInstallment())
-
     val snackMessage = mutableStateOf(SnackbarHostState())
 
     val searchText = mutableStateOf("")
-
-    val inputLockState = mutableStateOf(true)
-
-    fun hiddenEditButton() {
-        inputLockState.value = !inputLockState.value
-    }
-
-    fun changeStatus(it: PaymentStatusEnum) {
-        monthlyInstallment.value = monthlyInstallment.value.copy(status = it)
-    }
-
-    fun changeSearchText(text: String) {
-        searchText.value = text
-    }
-
-    fun searchAction() {
-
-    }
-
-    fun findAllAction() {
-
-    }
 
     val onLoadingState = mutableStateOf(false)
 
@@ -59,29 +35,8 @@ class PaymentViewModel(private val navController: NavHostController) : ViewModel
     fun getInputErrorMessage(field: String): String =
         inputErrors[field] ?: ""
 
-
-    fun whenStartingThePage() {
-        messageError.value = ""
-        inputErrors.clear()
-    }
-
-    fun updateAction() {
-        viewModelScope.launch {
-            //IMPLEMENTAR QR CODE
-        }
-    }
-
     fun goToHome() {
         navController.navigate("home")
-    }
-
-    fun goToInstallment(monthlyInstallmentNew: MonthlyInstallment) {
-        monthlyInstallment.value = monthlyInstallmentNew
-        navController.navigate("installment")
-    }
-
-    fun goToShowPayments() {
-        navController.navigate("showpayments")
     }
 
     fun goToShowLeases() {

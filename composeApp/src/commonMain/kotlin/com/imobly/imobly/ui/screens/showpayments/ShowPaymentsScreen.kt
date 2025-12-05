@@ -76,18 +76,6 @@ fun ShowPaymentsScreen(paymentViewModel: PaymentViewModel) {
 
             Box(
                 modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.Center
-            ) {
-                SearchBarComp(
-                    "Buscar pagamento",
-                    paymentViewModel.searchText.value,
-                    { paymentViewModel.changeSearchText(it) },
-                    { paymentViewModel.searchAction() }
-                )
-            }
-
-            Box(
-                modifier = Modifier.fillMaxWidth(),
                 contentAlignment = Alignment.Center,
             ) {
                 FilterChipComp(
@@ -105,8 +93,7 @@ fun ShowPaymentsScreen(paymentViewModel: PaymentViewModel) {
 
                 items(filteredList) { installment ->
                     PaymentCard(
-                        installment = installment,
-                        onClick = { paymentViewModel.goToInstallment(installment) }
+                        installment = installment
                     )
                 }
             }
@@ -115,10 +102,9 @@ fun ShowPaymentsScreen(paymentViewModel: PaymentViewModel) {
 }
 
 @Composable
-fun PaymentCard(installment: MonthlyInstallment, onClick: () -> Unit) {
+fun PaymentCard(installment: MonthlyInstallment) {
 
     Card(
-        onClick = onClick,
         modifier = Modifier
             .padding(10.dp)
             .widthIn(max = 700.dp)
